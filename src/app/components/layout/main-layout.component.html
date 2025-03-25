@@ -1,0 +1,109 @@
+<div class="layout-container" [class.dark-theme]="isDarkTheme">
+  <!-- Sidebar -->
+  <aside class="sidebar shadow" [class.collapsed]="isSidebarCollapsed">
+    <div class="sidebar-header">
+      <h1 class="logo">
+        <i class="bi bi-briefcase-fill me-2"></i>
+        <span class="logo-text" [class.d-none]="isSidebarCollapsed">Smart CRM</span>
+      </h1>
+      <button class="btn btn-toggle" (click)="toggleSidebar()">
+        <i class="bi" [ngClass]="isSidebarCollapsed ? 'bi-arrow-right-circle' : 'bi-arrow-left-circle'"></i>
+      </button>
+    </div>
+    <div class="sidebar-user" [class.text-center]="isSidebarCollapsed">
+      <div class="avatar-wrapper">
+        <div class="avatar">
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+      <div class="user-info" [class.d-none]="isSidebarCollapsed">
+        <h6 class="mb-0">John Doe</h6>
+        <span class="text-muted small">Administrator</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-grid-1x2-fill"></i>
+            <span class="nav-text" [class.d-none]="isSidebarCollapsed">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/follow-ups" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-bell-fill"></i>
+            <span class="nav-text" [class.d-none]="isSidebarCollapsed">Follow-ups</span>
+            <span class="badge bg-danger rounded-pill ms-auto" [class.d-none]="isSidebarCollapsed">5</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/users" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-people-fill"></i>
+            <span class="nav-text" [class.d-none]="isSidebarCollapsed">Users</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/settings" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-gear-fill"></i>
+            <span class="nav-text" [class.d-none]="isSidebarCollapsed">Settings</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer" [class.text-center]="isSidebarCollapsed">
+      <a href="#" class="logout">
+        <i class="bi bi-box-arrow-right"></i>
+        <span [class.d-none]="isSidebarCollapsed">Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-bar shadow-sm">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-sm btn-light d-md-none me-2" (click)="toggleSidebar()">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="search-box d-none d-md-block">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0" placeholder="Search...">
+          </div>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <div class="dropdown me-3">
+          <button class="btn btn-icon" type="button">
+            <i class="bi bi-bell position-relative">
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                3
+              </span>
+            </i>
+          </button>
+        </div>
+        <div class="dropdown">
+          <button class="btn theme-toggle" (click)="toggleTheme()">
+            <i class="bi" [ngClass]="isDarkTheme ? 'bi-sun' : 'bi-moon'"></i>
+          </button>
+        </div>
+        <div class="user-dropdown">
+          <button class="btn user-dropdown-toggle">
+            <div class="avatar-xs">
+              <i class="bi bi-person-circle"></i>
+            </div>
+            <span class="ms-2 d-none d-md-inline-block">John Doe</span>
+            <i class="bi bi-chevron-down ms-1 d-none d-md-inline-block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <div class="content-body">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </main>
+</div> 

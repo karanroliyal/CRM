@@ -1,0 +1,130 @@
+.data-table-container {
+  position: relative;
+}
+
+/* Table Styles */
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+.table thead th {
+  border-bottom-width: 1px;
+  font-weight: 600;
+  color: var(--dark);
+  background-color: rgba(0, 0, 0, 0.02);
+  white-space: nowrap;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table tbody tr.selected {
+  background-color: rgba(94, 114, 228, 0.1);
+}
+
+/* Sortable Columns */
+.sortable {
+  cursor: pointer;
+}
+
+.sortable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Pagination Styles */
+.pagination-container {
+  margin-top: 1rem;
+}
+
+.pagination {
+  margin-bottom: 0;
+}
+
+.page-item {
+  margin: 0 2px;
+}
+
+.page-link {
+  border-radius: 0.375rem;
+  color: var(--dark);
+  padding: 0.375rem 0.75rem;
+  min-width: 36px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Selection Column */
+.select-column {
+  width: 40px;
+  text-align: center;
+}
+
+/* Search Box */
+.input-group .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+/* Dark Theme Adaptations */
+:host-context(.dark-theme) .table thead th {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+:host-context(.dark-theme) .table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+:host-context(.dark-theme) .table {
+  color: #d0d2d6;
+}
+
+:host-context(.dark-theme) .page-link {
+  background-color: #283046;
+  border-color: #404656;
+  color: #d0d2d6;
+}
+
+:host-context(.dark-theme) .page-item.disabled .page-link {
+  background-color: #202736;
+  color: #6c7a93;
+}
+
+:host-context(.dark-theme) .form-select {
+  background-color: #283046;
+  color: #d0d2d6;
+  border-color: #404656;
+}
+
+:host-context(.dark-theme) .form-control {
+  background-color: #283046;
+  color: #d0d2d6;
+  border-color: #404656;
+}
+
+:host-context(.dark-theme) .input-group-text {
+  background-color: #283046;
+  color: #d0d2d6;
+  border-color: #404656;
+} 

@@ -1,0 +1,27 @@
+<nav class="sidebar" role="navigation" aria-label="Main navigation">
+  <div class="sidebar-header">
+    <img [src]="logoUrl$ | async" alt="Company Logo" class="logo" onerror="this.src='assets/images/default-logo.png'">
+    <h1>CRM Pro</h1>
+  </div>
+
+  <ul class="nav-menu" role="menu">
+    <li *ngFor="let item of menuItems" class="nav-item" role="none">
+      <a [routerLink]="item.route" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+         class="nav-link"
+         role="menuitem">
+        <i [class]="item.icon" aria-hidden="true"></i>
+        <span>{{ item.label }}</span>
+        <span class="badge" *ngIf="item.badge">{{ item.badge }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <a href="#" class="help-link" role="button">
+      <i class="bi bi-question-circle" aria-hidden="true"></i>
+      <span>Help & Support</span>
+    </a>
+  </div>
+</nav> 

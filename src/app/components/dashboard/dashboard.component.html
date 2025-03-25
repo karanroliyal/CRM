@@ -1,0 +1,394 @@
+<app-loader *ngIf="isLoading"></app-loader>
+
+<div class="dashboard-container" *ngIf="!isLoading">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <div class="welcome-text">
+      <h1>Welcome back, {{ userName }}!</h1>
+      <p>Here's your CRM activity overview</p>
+    </div>
+    <button class="btn btn-light">
+      <i class="bi bi-plus-circle"></i>
+      New Follow-up
+    </button>
+  </div>
+
+  <!-- Stats Cards Row -->
+  <div class="row g-4 mb-4">
+    <!-- Total Follow-ups Card -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card stat-card bg-white text-dark border-primary h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-list-check fs-1"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Total Follow-ups</h6>
+              <h2 class="card-title mb-0 text-primary">{{ totalFollowUps }}</h2>
+            </div>
+          </div>
+          <div class="progress bg-light" style="height: 4px;">
+            <div class="progress-bar bg-primary" [style.width]="'100%'"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Follow-ups Card -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card stat-card bg-white text-dark border-warning h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="stat-icon bg-warning">
+              <i class="bi bi-hourglass-split fs-1"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Pending</h6>
+              <h2 class="card-title mb-0 text-warning">{{ pendingFollowUps }}</h2>
+            </div>
+          </div>
+          <div class="progress bg-light" style="height: 4px;">
+            <div class="progress-bar bg-warning" [style.width]="(pendingFollowUps / totalFollowUps * 100) + '%'"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Follow-ups Card -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card stat-card bg-white text-dark border-success h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="stat-icon bg-success">
+              <i class="bi bi-check-circle fs-1"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Completed</h6>
+              <h2 class="card-title mb-0 text-success">{{ completedFollowUps }}</h2>
+            </div>
+          </div>
+          <div class="progress bg-light" style="height: 4px;">
+            <div class="progress-bar bg-success" [style.width]="(completedFollowUps / totalFollowUps * 100) + '%'"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue Follow-ups Card -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card stat-card bg-white text-dark border-danger h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="stat-icon bg-danger">
+              <i class="bi bi-exclamation-triangle fs-1"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Overdue</h6>
+              <h2 class="card-title mb-0 text-danger">{{ overdueFollowUps }}</h2>
+            </div>
+          </div>
+          <div class="progress bg-light" style="height: 4px;">
+            <div class="progress-bar bg-danger" [style.width]="(overdueFollowUps / totalFollowUps * 100) + '%'"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-4 mb-4">
+    <!-- Follow-ups by Status -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-pie-chart me-2"></i>
+          <h5 class="card-title mb-0">Follow-ups by Status</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Follow-ups by Priority -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-bar-chart me-2"></i>
+          <h5 class="card-title mb-0">Follow-ups by Priority</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="priorityChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity and Upcoming Follow-ups Row -->
+  <div class="row g-4">
+    <!-- Recent Activity -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-activity me-2"></i>
+          <h5 class="card-title mb-0">Recent Activity</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item" *ngFor="let activity of recentActivities">
+              <div class="d-flex align-items-center">
+                <div class="activity-icon me-3" [ngClass]="getActivityIconClass(activity.type)">
+                  <i [class]="getActivityIcon(activity.type)"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ activity.title }}</h6>
+                  <p class="mb-0 text-muted small">{{ activity.description }}</p>
+                  <small class="text-muted">{{ activity.time | timeAgo }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Follow-ups -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-calendar-event me-2"></i>
+            <h5 class="card-title mb-0">Upcoming Follow-ups</h5>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-calendar"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-list-ul"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item" *ngFor="let followUp of upcomingFollowUps">
+              <div class="d-flex align-items-center">
+                <div class="priority-indicator me-3" [ngClass]="'priority-' + followUp.priority">
+                  <i class="bi" [ngClass]="getPriorityIcon(followUp.priority)"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ followUp.title }}</h6>
+                  <p class="mb-0 text-muted small">
+                    <i class="bi bi-person me-1"></i>{{ followUp.clientName }}
+                    <span class="mx-2">•</span>
+                    <i class="bi bi-clock me-1"></i>{{ followUp.dueDate | date:'shortDate' }}
+                  </p>
+                </div>
+                <div class="ms-3">
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="main-grid">
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <h2>Follow-up Trends</h2>
+      <div class="chart-controls">
+        <button class="btn btn-outline-primary active">Monthly</button>
+        <button class="btn btn-outline-primary">Weekly</button>
+        <button class="btn btn-outline-primary">Daily</button>
+      </div>
+      <div class="chart-container">
+        <canvas #successRateChart aria-label="Success Rate Chart" role="img"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent Follow-ups -->
+    <div class="recent-section">
+      <h2>Recent Follow-ups</h2>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let followUp of recentFollowUps">
+              <td>
+                <div class="client-info">
+                  <span class="client-name">{{ followUp.clientName }}</span>
+                  <small class="text-muted">{{ followUp.type }}</small>
+                </div>
+              </td>
+              <td>
+                <app-status-badge [type]="getStatusColor(followUp.status)" [text]="followUp.status">
+                </app-status-badge>
+              </td>
+              <td>{{ followUp.date | timeAgo }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Team Performance -->
+    <div class="team-section">
+      <h2>Team Performance</h2>
+      <div class="team-list">
+        <div *ngFor="let member of teamMembers" class="team-member">
+          <img [src]="member.avatar" [alt]="member.name" class="avatar">
+          <div class="member-info">
+            <h3>{{ member.name }}</h3>
+            <p>{{ member.role }}</p>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" [style.width.%]="member.progress"
+                 [class]="'bg-' + member.status">
+              {{ member.progress }}%
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas #teamPerformanceChart aria-label="Team Performance Chart" role="img"></canvas>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Quick Actions</h2>
+      <div class="action-grid">
+        <a *ngFor="let action of quickActions" [routerLink]="action.link" class="action-card">
+          <i [class]="'bi bi-' + action.icon"></i>
+          <span>{{ action.title }}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div class="insights-section">
+      <h2>AI Insights</h2>
+      <div class="insights-grid">
+        <div *ngFor="let insight of aiInsights" class="insight-card" [class]="'insight-' + insight.type">
+          <i [class]="insight.icon"></i>
+          <h3>{{ insight.title }}</h3>
+          <p>{{ insight.description }}</p>
+          <small class="text-muted">Updated {{ insight.time | timeAgo }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Response Time Chart -->
+  <div class="chart-section">
+    <h2>Response Time Analytics</h2>
+    <div class="chart-container">
+      <canvas #responseTimeChart aria-label="Response Time Chart" role="img"></canvas>
+    </div>
+  </div>
+
+  <!-- Communication Summary -->
+  <div class="communication-section">
+    <h2>Recent Communications</h2>
+    <div class="communication-list">
+      <div class="communication-item" *ngFor="let comm of recentCommunications">
+        <div class="comm-icon" [class]="comm.type">
+          <i [class]="'bi bi-' + comm.icon"></i>
+        </div>
+        <div class="comm-content">
+          <h4>{{ comm.title }}</h4>
+          <p>{{ comm.description }}</p>
+          <span class="comm-time">{{ comm.time | timeAgo }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Engagement -->
+  <div class="engagement-section">
+    <h2>Client Engagement</h2>
+    <div class="engagement-grid">
+      <div class="client-card" *ngFor="let client of engagedClients">
+        <h3>{{ client.name }}</h3>
+        <p>Last interaction: {{ client.lastInteraction | timeAgo }}</p>
+        <div class="engagement-score">
+          <div class="score-indicator" [class]="client.scoreClass"></div>
+          <span>{{ client.score }}% Engagement</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Info -->
+  <div class="subscription-section" *ngIf="showSubscriptionInfo">
+    <h2>Subscription Details</h2>
+    <div class="usage-stats">
+      <div class="usage-item">
+        <div class="usage-header">
+          <h4>Follow-Ups Used</h4>
+          <span>{{ usageStats.followUps.used }}/{{ usageStats.followUps.total }}</span>
+        </div>
+        <div class="usage-bar">
+          <div class="usage-progress" [style.width.%]="usageStats.followUps.percentage"></div>
+        </div>
+      </div>
+      <div class="usage-item">
+        <div class="usage-header">
+          <h4>Storage Used</h4>
+          <span>{{ usageStats.storage.used }}/{{ usageStats.storage.total }}</span>
+        </div>
+        <div class="usage-bar">
+          <div class="usage-progress" [style.width.%]="usageStats.storage.percentage"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" *ngIf="showUpgradeButton">
+      <i class="bi bi-arrow-up-circle"></i>
+      Upgrade Plan
+    </button>
+  </div>
+
+  <!-- Notification Panel -->
+  <div class="notification-panel" [class.show]="showNotifications">
+    <div class="notification-header">
+      <h3>Notifications</h3>
+      <button class="btn btn-close" (click)="toggleNotifications()"></button>
+    </div>
+    <div class="notification-list">
+      <div class="notification-item" *ngFor="let notification of notifications">
+        <div class="notification-icon">
+          <i [class]="'bi bi-' + notification.icon"></i>
+        </div>
+        <div class="notification-content">
+          <h4>{{ notification.title }}</h4>
+          <p>{{ notification.message }}</p>
+          <span class="notification-time">{{ notification.time | timeAgo }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

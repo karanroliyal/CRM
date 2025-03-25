@@ -1,0 +1,195 @@
+<div class="data-table-container">
+  <!-- Table Search and Page Size Controls -->
+  <div class="table-controls mb-3" *ngIf="showSearch || showPagination">
+    <div class="row align-items-center">
+      <!-- Search Box -->
+      <div class="col-md-6 mb-2 mb-md-0" *ngIf="showSearch">
+        <div class="input-group">
+          <span class="input-group-text bg-light">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search..."
+            [(ngModel)]="searchText"
+            (input)="onSearchChange()"
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            *ngIf="searchText"
+            (click)="searchText = ''; onSearchChange()"
+          >
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Page Size Selector -->
+      <div class="col-md-6" *ngIf="showPagination">
+        <div class="d-flex justify-content-md-end align-items-center gap-2">
+          <label class="mb-0 text-nowrap d-none d-sm-block">Rows per page:</label>
+          <select
+            class="form-select form-select-sm w-auto"
+            [(ngModel)]="pageSizeSelected"
+            (change)="onPageSizeChange()"
+          >
+            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table" [class.table-striped]="striped" [class.table-hover]="hover" [class.table-bordered]="bordered">
+      <thead>
+        <tr>
+          <!-- Selection Column -->
+          <th *ngIf="selectable" class="select-column">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [checked]="allSelected"
+                (change)="toggleSelectAll()"
+              />
+            </div>
+          </th>
+          
+          <!-- Column Headers -->
+          <th
+            *ngFor="let column of columns"
+            [style.width]="column.width || 'auto'"
+            [class]="column.class || ''"
+            [class.sortable]="column.sortable && sortable"
+            (click)="onSort(column)"
+          >
+            <div class="d-flex align-items-center">
+              {{ column.title }}
+              <i
+                *ngIf="column.sortable && sortable"
+                class="bi ms-1"
+                [ngClass]="{ 
+                  'bi-sort-alpha-down': getSortClass(column) === 'sort-asc',
+                  'bi-sort-alpha-up': getSortClass(column) === 'sort-desc',
+                  'bi-filter': getSortClass(column) === 'sort'
+                }"
+              ></i>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      
+      <tbody>
+        <!-- Loading Placeholder -->
+        <tr *ngIf="loading">
+          <td [attr.colspan]="selectable ? columns.length + 1 : columns.length" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading data...</p>
+          </td>
+        </tr>
+        
+        <!-- Empty State -->
+        <tr *ngIf="!loading && displayedData.length === 0">
+          <td [attr.colspan]="selectable ? columns.length + 1 : columns.length" class="text-center py-5">
+            <i class="bi bi-inbox display-4 text-muted"></i>
+            <p class="mt-2 text-muted">{{ emptyMessage }}</p>
+          </td>
+        </tr>
+        
+        <!-- Data Rows -->
+        <tr
+          *ngFor="let row of displayedData"
+          (click)="onRowClick(row)"
+          [class.selected]="isRowSelected(row)"
+        >
+          <!-- Selection Cell -->
+          <td *ngIf="selectable" class="select-column">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [checked]="isRowSelected(row)"
+                (click)="toggleSelectRow(row, $event)"
+              />
+            </div>
+          </td>
+          
+          <!-- Data Cells -->
+          <td
+            *ngFor="let column of columns"
+            [class]="column.class || ''"
+          >
+            <ng-container *ngIf="column.type !== 'custom'; else customCell">
+              {{ getFormattedCellData(row, column) }}
+            </ng-container>
+            <ng-template #customCell>
+              <ng-container *ngTemplateOutlet="customTemplate; context: { $implicit: row, column: column }"></ng-container>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container d-flex justify-content-between align-items-center" *ngIf="showPagination && totalPages > 0">
+    <div class="pagination-info text-muted small">
+      Showing {{ currentPage * pageSizeSelected + 1 }} to {{ 
+        Math.min((currentPage + 1) * pageSizeSelected, totalItems) 
+      }} of {{ totalItems }} entries
+    </div>
+    
+    <nav aria-label="Table pagination">
+      <ul class="pagination mb-0">
+        <!-- First Page -->
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <a class="page-link" aria-label="First" (click)="onPageChange(0)">
+            <i class="bi bi-chevron-double-left"></i>
+          </a>
+        </li>
+        
+        <!-- Previous Page -->
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <a class="page-link" aria-label="Previous" (click)="onPageChange(currentPage - 1)">
+            <i class="bi bi-chevron-left"></i>
+          </a>
+        </li>
+        
+        <!-- Page Numbers -->
+        <li 
+          *ngFor="let page of getPages()" 
+          class="page-item" 
+          [class.active]="page === currentPage"
+        >
+          <a class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</a>
+        </li>
+        
+        <!-- Next Page -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+          <a class="page-link" aria-label="Next" (click)="onPageChange(currentPage + 1)">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </li>
+        
+        <!-- Last Page -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+          <a class="page-link" aria-label="Last" (click)="onPageChange(totalPages - 1)">
+            <i class="bi bi-chevron-double-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<ng-template #customTemplate let-row let-column="column">
+  <ng-content
+    *ngTemplateOutlet="customCellTemplate; context: { $implicit: row, column: column }"
+  ></ng-content>
+</ng-template> 

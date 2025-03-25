@@ -1,0 +1,34 @@
+<div class="card h-100 shadow-sm">
+  <!-- Card loading overlay -->
+  <div class="card-loading-overlay" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  
+  <!-- Card Header -->
+  <div class="card-header d-flex justify-content-between align-items-center" *ngIf="title">
+    <div class="d-flex align-items-center">
+      <div class="card-icon me-3" *ngIf="icon" [ngClass]="'bg-' + iconBg">
+        <i class="bi" [ngClass]="'bi-' + icon"></i>
+      </div>
+      <div>
+        <h5 class="card-title mb-0">{{ title }}</h5>
+        <p class="card-subtitle text-muted mb-0" *ngIf="subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="headerAction">
+      <ng-content select="[card-header-action]"></ng-content>
+    </div>
+  </div>
+  
+  <!-- Card Body -->
+  <div class="card-body">
+    <ng-content></ng-content>
+  </div>
+  
+  <!-- Card Footer -->
+  <div class="card-footer bg-transparent" *ngIf="footerAction">
+    <ng-content select="[card-footer]"></ng-content>
+  </div>
+</div> 

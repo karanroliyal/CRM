@@ -1,0 +1,186 @@
+<div class="follow-ups-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="title-section">
+      <h1>Follow-Ups</h1>
+      <!-- View mode toggle -->
+      <div class="view-mode-toggle mb-3">
+        <button class="btn" [class.btn-primary]="viewMode === 'kanban'" (click)="viewMode = 'kanban'">
+          <i class="bi bi-kanban"></i> Kanban
+        </button>
+        <button class="btn" [class.btn-primary]="viewMode === 'list'" (click)="viewMode = 'list'">
+          <i class="bi bi-list-ul"></i> List
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters mb-3">
+      <div class="input-group">
+        <select class="form-select" [(ngModel)]="statusFilter">
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="overdue">Overdue</option>
+        </select>
+        <select class="form-select" [(ngModel)]="priorityFilter">
+          <option value="all">All Priorities</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <input type="text" class="form-control" placeholder="Search follow-ups..." [(ngModel)]="searchTerm">
+      </div>
+    </div>
+  </div>
+
+  <!-- Kanban View -->
+  <div class="kanban-board" *ngIf="viewMode === 'kanban'">
+    <div class="kanban-column" *ngFor="let status of columns">
+      <div class="column-header">
+        <h3>{{ status | titlecase }}</h3>
+        <span class="badge bg-secondary">{{ (getFollowUpsByStatus$(status) | async)?.length || 0 }}</span>
+      </div>
+      <div class="column-content">
+        <ng-container *ngFor="let followUp of getFollowUpsByStatus$(status) | async">
+          <app-card [customClass]="'follow-up-card'" [showHeader]="true" [showFooter]="true">
+            <div class="card-header">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ followUp.title }}</h5>
+                <div class="dropdown" [class.show]="isDropdownOpen(followUp.id)">
+                  <button class="btn btn-link" (click)="toggleDropdown(followUp.id, $event)">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <div class="dropdown-menu" [class.show]="isDropdownOpen(followUp.id)">
+                    <button class="dropdown-item" (click)="sendReminder(followUp.id, 'email')">
+                      <i class="bi bi-envelope"></i> Send Email Reminder
+                    </button>
+                    <button class="dropdown-item" (click)="sendReminder(followUp.id, 'sms')">
+                      <i class="bi bi-chat"></i> Send SMS Reminder
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item text-danger" (click)="deleteFollowUp(followUp.id)">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="client-info mb-2">
+                <i class="bi bi-building"></i>
+                <span>{{ followUp.clientName }} - {{ followUp.companyName }}</span>
+              </div>
+              <div class="due-date mb-2">
+                <i class="bi bi-calendar"></i>
+                <span>Due: {{ followUp.dueDate | date:'medium' }}</span>
+              </div>
+              <div class="assigned-to mb-2">
+                <i class="bi bi-person"></i>
+                <span>Assigned to: {{ followUp.assignedTo?.fullName }}</span>
+              </div>
+              <div class="tags">
+                <span class="badge bg-primary me-1" *ngFor="let tag of followUp.tags">{{ tag.name }}</span>
+              </div>
+              <div class="ai-recommendations mt-2" *ngIf="aiEnabled && showAISuggestions">
+                <div class="alert alert-info">
+                  <i class="bi bi-lightbulb"></i>
+                  <span>{{ followUp.aiRecommendation?.suggestion }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="priority">
+                  <span class="badge" [ngClass]="{
+                    'bg-danger': followUp.priority === 'high',
+                    'bg-warning': followUp.priority === 'medium',
+                    'bg-info': followUp.priority === 'low'
+                  }">{{ followUp.priority | titlecase }}</span>
+                </div>
+                <div class="actions">
+                  <button class="btn btn-sm btn-success me-1" (click)="markAsCompleted(followUp.id)" *ngIf="followUp.status !== 'completed'">
+                    <i class="bi bi-check2"></i>
+                  </button>
+                  <button class="btn btn-sm btn-primary" (click)="reschedule(followUp.id, followUp.dueDate)">
+                    <i class="bi bi-calendar-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </app-card>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- List View -->
+  <div class="list-view" *ngIf="viewMode === 'list'">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Client</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Assigned To</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let followUp of filteredFollowUps$ | async">
+            <td>{{ followUp.title }}</td>
+            <td>{{ followUp.clientName }} - {{ followUp.companyName }}</td>
+            <td>{{ followUp.dueDate | date:'medium' }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-warning': followUp.status === 'pending',
+                'bg-primary': followUp.status === 'in_progress',
+                'bg-success': followUp.status === 'completed',
+                'bg-danger': followUp.status === 'overdue'
+              }">{{ followUp.status | titlecase }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-danger': followUp.priority === 'high',
+                'bg-warning': followUp.priority === 'medium',
+                'bg-info': followUp.priority === 'low'
+              }">{{ followUp.priority | titlecase }}</span>
+            </td>
+            <td>{{ followUp.assignedTo?.fullName }}</td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-success" (click)="markAsCompleted(followUp.id)" *ngIf="followUp.status !== 'completed'">
+                  <i class="bi bi-check2"></i>
+                </button>
+                <button class="btn btn-sm btn-primary" (click)="reschedule(followUp.id, followUp.dueDate)">
+                  <i class="bi bi-calendar-plus"></i>
+                </button>
+                <div class="btn-group" [class.show]="isDropdownOpen(followUp.id)">
+                  <button class="btn btn-sm btn-secondary dropdown-toggle" (click)="toggleDropdown(followUp.id, $event)">
+                    More
+                  </button>
+                  <div class="dropdown-menu" [class.show]="isDropdownOpen(followUp.id)">
+                    <button class="dropdown-item" (click)="sendReminder(followUp.id, 'email')">
+                      <i class="bi bi-envelope"></i> Send Email Reminder
+                    </button>
+                    <button class="dropdown-item" (click)="sendReminder(followUp.id, 'sms')">
+                      <i class="bi bi-chat"></i> Send SMS Reminder
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item text-danger" (click)="deleteFollowUp(followUp.id)">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div> 

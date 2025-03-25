@@ -1,0 +1,296 @@
+<div class="settings-container">
+  <!-- Settings Header -->
+  <div class="settings-header">
+    <h1 class="settings-title">Settings</h1>
+  </div>
+
+  <!-- Settings Content -->
+  <div class="settings-wrapper">
+    <!-- Settings Sidebar -->
+    <div class="settings-sidebar">
+      <ul class="settings-nav">
+        <li class="settings-nav-item" *ngFor="let section of settingsSections">
+          <a class="settings-nav-link" 
+             [class.active]="activeSettingSection === section.id"
+             (click)="setActiveSection(section.id)">
+            <i class="bi bi-{{section.icon}} settings-nav-icon"></i>
+            {{section.name}}
+            <span class="badge {{section.badgeClass}} ms-auto" *ngIf="section.badge">{{section.badge}}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Settings Main Content -->
+    <div class="settings-content">
+      <!-- Loading State -->
+      <app-loader *ngIf="isLoading"></app-loader>
+
+      <!-- Success Message -->
+      <div class="settings-alert settings-alert-success" *ngIf="saveSuccess">
+        <i class="bi bi-check-circle settings-alert-icon"></i>
+        Settings saved successfully!
+      </div>
+
+      <!-- Error Message -->
+      <div class="settings-alert settings-alert-error" *ngIf="saveError">
+        <i class="bi bi-exclamation-circle settings-alert-icon"></i>
+        Failed to save settings. Please try again.
+      </div>
+
+      <!-- General Settings -->
+      <div *ngIf="activeSettingSection === 'general'">
+        <app-card>
+          <div class="settings-card-header">
+            <h2 class="settings-card-title">General Settings</h2>
+            <p class="settings-card-subtitle">Configure your business information and preferences</p>
+          </div>
+          <div class="settings-card-body">
+            <form [formGroup]="generalSettingsForm" (ngSubmit)="saveSettings()">
+              <!-- Business Name -->
+              <div class="form-group">
+                <label class="form-label">Business Name</label>
+                <input type="text" class="form-control" formControlName="businessName">
+              </div>
+
+              <!-- Logo Upload -->
+              <div class="form-group">
+                <label class="form-label">Business Logo</label>
+                <div class="logo-upload">
+                  <div class="logo-preview">
+                    <img [src]="generalSettingsForm.get('logo')?.value || 'assets/placeholder.png'" alt="Logo">
+                  </div>
+                  <div class="file-upload-btn">
+                    <button type="button" class="btn btn-outline-primary">
+                      <i class="bi bi-upload me-2"></i>Upload Logo
+                    </button>
+                    <input type="file" (change)="uploadLogo($event)" accept="image/*">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Timezone -->
+              <div class="form-group">
+                <label class="form-label">Timezone</label>
+                <select class="form-select" formControlName="timezone">
+                  <option value="">Select a timezone</option>
+                  <option *ngFor="let tz of timezones" [value]="tz.code">
+                    {{tz.name}}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Currency -->
+              <div class="form-group">
+                <label class="form-label">Currency</label>
+                <select class="form-select" formControlName="currency">
+                  <option *ngFor="let currency of currencies" [value]="currency.code">{{currency.name}}</option>
+                </select>
+              </div>
+
+              <!-- Language -->
+              <div class="form-group">
+                <label class="form-label">Language</label>
+                <select class="form-select" formControlName="language">
+                  <option *ngFor="let lang of languages" [value]="lang.code">{{lang.name}}</option>
+                </select>
+              </div>
+
+              <!-- Working Days -->
+              <div class="form-group" formGroupName="workingDays">
+                <label class="form-label">Working Days</label>
+                <div class="working-days">
+                  <div class="form-check" *ngFor="let day of days">
+                    <input type="checkbox" class="form-check-input" [formControlName]="day">
+                    <label class="form-check-label">{{day}}</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Working Hours -->
+              <div class="form-group" formGroupName="workingHours">
+                <label class="form-label">Working Hours</label>
+                <div class="row">
+                  <div class="col-md-6">
+                    <select class="form-select" formControlName="start">
+                      <option *ngFor="let time of timeSlots" [value]="time">{{time}}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <select class="form-select" formControlName="end">
+                      <option *ngFor="let time of timeSlots" [value]="time">{{time}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Save Button -->
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary" [disabled]="!generalSettingsForm.valid || isLoading">
+                  <i class="bi bi-save me-2"></i>Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </app-card>
+      </div>
+
+      <!-- User & Role Management -->
+      <div *ngIf="activeSettingSection === 'users'">
+        <app-card>
+          <div class="settings-card-header">
+            <h2 class="settings-card-title">User Management</h2>
+            <p class="settings-card-subtitle">Manage users and their roles</p>
+          </div>
+          <div class="settings-card-body">
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of users">
+                  <td>{{user.name}}</td>
+                  <td>{{user.email}}</td>
+                  <td>{{user.role}}</td>
+                  <td>
+                    <span class="user-badge" [class]="user.status.toLowerCase()">{{user.status}}</span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-2">Edit</button>
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </app-card>
+
+        <app-card>
+          <div class="settings-card-header">
+            <h2 class="settings-card-title">Role Management</h2>
+            <p class="settings-card-subtitle">Configure user roles and permissions</p>
+          </div>
+          <div class="settings-card-body">
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>Role Name</th>
+                  <th>Permissions</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let role of roles">
+                  <td>{{role.name}}</td>
+                  <td>{{role.permissions}}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-2">Edit</button>
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </app-card>
+      </div>
+
+      <!-- Integrations -->
+      <div *ngIf="activeSettingSection === 'integration'">
+        <app-card>
+          <div class="settings-card-header">
+            <h2 class="settings-card-title">Integrations</h2>
+            <p class="settings-card-subtitle">Connect your favorite tools and services</p>
+          </div>
+          <div class="settings-card-body">
+            <div class="integration-grid">
+              <div class="integration-card" *ngFor="let integration of integrations">
+                <div class="integration-icon">
+                  <i class="bi bi-{{integration.icon}}"></i>
+                </div>
+                <div class="integration-info">
+                  <h4 class="integration-name">{{integration.name}}</h4>
+                  <p class="integration-status">{{integration.connected ? 'Connected' : 'Not Connected'}}</p>
+                </div>
+                <label class="switch ms-3">
+                  <input type="checkbox" 
+                         [checked]="integration.connected"
+                         (change)="toggleIntegration(integration.id)">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </app-card>
+      </div>
+
+      <!-- AI Settings -->
+      <div *ngIf="activeSettingSection === 'ai'">
+        <app-card>
+          <div class="settings-card-header">
+            <h2 class="settings-card-title">AI & Automation</h2>
+            <p class="settings-card-subtitle">Configure AI-powered features and automation</p>
+          </div>
+          <div class="settings-card-body">
+            <div class="form-group">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <label class="form-label mb-0">Enable AI Features</label>
+                  <p class="form-hint mb-0">Turn on AI-powered features across the platform</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="aiSettings.enableAI">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <label class="form-label mb-0">Smart Follow-ups</label>
+                  <p class="form-hint mb-0">AI-powered follow-up suggestions</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="aiSettings.smartFollowUps">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <label class="form-label mb-0">Lead Scoring</label>
+                  <p class="form-hint mb-0">Automatic lead scoring based on behavior</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="aiSettings.leadScoring">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <label class="form-label mb-0">Auto Responders</label>
+                  <p class="form-hint mb-0">AI-powered automatic responses</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="aiSettings.autoResponders">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </app-card>
+      </div>
+    </div>
+  </div>
+</div> 

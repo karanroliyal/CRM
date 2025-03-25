@@ -1,0 +1,368 @@
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.settings-header {
+  margin-bottom: 1.5rem;
+}
+
+.settings-title {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.settings-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.settings-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  height: 100%;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.settings-content {
+  flex: 1;
+}
+
+/* Settings Navigation */
+.settings-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.settings-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: var(--dark);
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.settings-nav-link:hover {
+  background-color: rgba(94, 114, 228, 0.1);
+}
+
+.settings-nav-link.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.settings-nav-icon {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+  width: 1.5rem;
+  text-align: center;
+}
+
+/* Settings Card */
+.settings-card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 1.5rem;
+}
+
+.settings-card-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.settings-card-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--dark);
+}
+
+.settings-card-subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.settings-card-body {
+  padding: 1.25rem;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--dark);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+/* Working Hours */
+.working-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+/* File Upload */
+.logo-upload {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 0.5rem;
+  border: 1px dashed #ced4da;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.logo-preview img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.file-upload-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload-btn input[type=file] {
+  position: absolute;
+  font-size: 100px;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Integration Cards */
+.integration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.integration-card {
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.integration-card:hover {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.integration-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.25rem;
+}
+
+.integration-info {
+  flex: 1;
+}
+
+.integration-name {
+  font-weight: 500;
+  margin: 0;
+  color: var(--dark);
+}
+
+.integration-status {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--primary);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* User Table */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th, 
+.user-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ced4da;
+}
+
+.user-table thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.user-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.user-badge.active {
+  background-color: rgba(46, 202, 106, 0.1);
+  color: #2eca6a;
+}
+
+.user-badge.inactive {
+  background-color: rgba(241, 85, 108, 0.1);
+  color: #f1556c;
+}
+
+/* Alert Messages */
+.settings-alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.settings-alert-success {
+  background-color: rgba(46, 202, 106, 0.1);
+  color: #2eca6a;
+}
+
+.settings-alert-error {
+  background-color: rgba(241, 85, 108, 0.1);
+  color: #f1556c;
+}
+
+.settings-alert-icon {
+  margin-right: 0.5rem;
+}
+
+/* Dark Theme Adaptations */
+:host-context(.dark-theme) .settings-card {
+  background-color: #283046;
+}
+
+:host-context(.dark-theme) .settings-card-header {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+:host-context(.dark-theme) .settings-card-title,
+:host-context(.dark-theme) .settings-title,
+:host-context(.dark-theme) .form-label {
+  color: #fff;
+}
+
+:host-context(.dark-theme) .settings-card-subtitle,
+:host-context(.dark-theme) .form-hint {
+  color: #a3a9b7;
+}
+
+:host-context(.dark-theme) .settings-nav-link:not(.active) {
+  color: #d0d2d6;
+}
+
+:host-context(.dark-theme) .settings-nav-link:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+:host-context(.dark-theme) .integration-card {
+  border-color: #404656;
+}
+
+:host-context(.dark-theme) .integration-icon {
+  background-color: #384056;
+}
+
+:host-context(.dark-theme) .integration-name {
+  color: #fff;
+}
+
+:host-context(.dark-theme) .integration-status {
+  color: #a3a9b7;
+}
+
+:host-context(.dark-theme) .user-table thead th {
+  background-color: #384056;
+  color: #fff;
+}
+
+:host-context(.dark-theme) .user-table td {
+  border-color: #404656;
+} 
